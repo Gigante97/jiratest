@@ -1,13 +1,17 @@
 package jira;
 
 import com.atlassian.jira.rest.client.api.JiraRestClient;
+import com.atlassian.jira.rest.client.api.domain.Comment;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.SearchResult;
+import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
+import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.atlassian.util.concurrent.Promise;
 import org.apache.http.client.methods.HttpPut;
 
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
 
 public class MyJiraClient {
 
@@ -31,6 +35,14 @@ public class MyJiraClient {
     }
     public Issue getIssue(String issueKey) {
         return restClient.getIssueClient().getIssue(issueKey).claim();
+    }
+
+    public void addComment(Issue issue, String text) throws ExecutionException, InterruptedException {
+         restClient.getIssueClient().addComment(issue.getCommentsUri(),Comment.valueOf(text));
+        IssueInput issueInput = new IssueInputBuilder()
+                .setAssigneeName("d.khindy")
+                .build();
+         restClient.getIssueClient().updateIssue(issue.getKey(), issueInput).get();
     }
 
     public String checkCritical() {
